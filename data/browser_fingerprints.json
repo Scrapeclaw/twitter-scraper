@@ -1,0 +1,175 @@
+{
+  "profiles": [
+    {
+      "os": "Windows",
+      "browser": "Chrome",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "screen": {
+        "width": 1920,
+        "height": 1080,
+        "depth": 24
+      },
+      "timezone": "America/New_York",
+      "locale": "en-US",
+      "webgl_vendor": "Google Inc. (Intel)",
+      "webgl_renderer": "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)",
+      "fonts": [
+        "Arial",
+        "Calibri",
+        "Cambria",
+        "Comic Sans MS",
+        "Consolas",
+        "Courier New",
+        "Georgia",
+        "Impact",
+        "Lucida Console",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana"
+      ],
+      "plugins": [
+        "Chrome PDF Plugin",
+        "Chrome PDF Viewer",
+        "Native Client"
+      ],
+      "hardware_concurrency": 8,
+      "device_memory": 8,
+      "max_touch_points": 0,
+      "color_depth": 24,
+      "pixel_ratio": 1
+    },
+    {
+      "os": "Windows",
+      "browser": "Chrome",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "screen": {
+        "width": 1366,
+        "height": 768,
+        "depth": 24
+      },
+      "timezone": "America/Los_Angeles",
+      "locale": "en-US",
+      "webgl_vendor": "Google Inc. (NVIDIA)",
+      "webgl_renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 1050 Ti Direct3D11 vs_5_0 ps_5_0)",
+      "fonts": [
+        "Arial",
+        "Calibri",
+        "Cambria",
+        "Comic Sans MS",
+        "Consolas",
+        "Courier New",
+        "Georgia",
+        "Impact",
+        "Lucida Console",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana"
+      ],
+      "plugins": [
+        "Chrome PDF Plugin",
+        "Chrome PDF Viewer",
+        "Native Client"
+      ],
+      "hardware_concurrency": 4,
+      "device_memory": 4,
+      "max_touch_points": 0,
+      "color_depth": 24,
+      "pixel_ratio": 1.25
+    },
+    {
+      "os": "Mac",
+      "browser": "Chrome",
+      "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "screen": {
+        "width": 2880,
+        "height": 1800,
+        "depth": 24
+      },
+      "timezone": "America/Chicago",
+      "locale": "en-US",
+      "webgl_vendor": "Google Inc. (Apple)",
+      "webgl_renderer": "ANGLE (Apple, Apple M1 Pro, OpenGL 4.1)",
+      "fonts": [
+        "Helvetica Neue",
+        "Helvetica",
+        "Arial",
+        "Times",
+        "Times New Roman",
+        "Courier",
+        "Courier New",
+        "Verdana",
+        "Georgia",
+        "Palatino",
+        "Garamond",
+        "Bookman",
+        "Comic Sans MS",
+        "Trebuchet MS",
+        "Arial Black",
+        "Impact"
+      ],
+      "plugins": [
+        "Chrome PDF Plugin",
+        "Chrome PDF Viewer",
+        "Native Client"
+      ],
+      "hardware_concurrency": 10,
+      "device_memory": 16,
+      "max_touch_points": 0,
+      "color_depth": 30,
+      "pixel_ratio": 2
+    },
+    {
+      "os": "Windows",
+      "browser": "Firefox",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "screen": {
+        "width": 1920,
+        "height": 1080,
+        "depth": 24
+      },
+      "timezone": "America/Denver",
+      "locale": "en-US",
+      "webgl_vendor": "Google Inc.",
+      "webgl_renderer": "ANGLE (Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0)",
+      "fonts": [
+        "Arial",
+        "Calibri",
+        "Cambria",
+        "Comic Sans MS",
+        "Consolas",
+        "Courier New",
+        "Georgia",
+        "Impact",
+        "Lucida Console",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana"
+      ],
+      "plugins": [],
+      "hardware_concurrency": 8,
+      "device_memory": 8,
+      "max_touch_points": 0,
+      "color_depth": 24,
+      "pixel_ratio": 1
+    }
+  ]
+}

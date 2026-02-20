@@ -1,0 +1,42 @@
+{
+  "google_search": {
+    "enabled": true,
+    "api_key": "",
+    "search_engine_id": "",
+    "queries_per_location": 3
+  },
+  "scraper": {
+    "headless": false,
+    "min_followers": 100,
+    "download_thumbnails": true,
+    "max_thumbnails": 6,
+    "max_tweets": 20,
+    "delay_between_profiles": [
+      4,
+      8
+    ],
+    "timeout": 60000
+  },
+  "cities": [
+    "New York",
+    "Los Angeles",
+    "Miami",
+    "Chicago",
+    "San Francisco",
+    "Houston",
+    "Phoenix",
+    "Philadelphia",
+    "San Antonio",
+    "San Diego"
+  ],
+  "categories": [
+    "tech",
+    "politics",
+    "sports",
+    "entertainment",
+    "news",
+    "crypto",
+    "gaming",
+    "science"
+  ]
+}
