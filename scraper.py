@@ -85,6 +85,12 @@ class TwitterScraper:
         from anti_detection import AntiDetectionManager
         self.anti_detection = AntiDetectionManager(DATA_DIR)
 
+        # Initialize proxy manager
+        from proxy_manager import ProxyManager
+        self.proxy_manager = ProxyManager.from_config(CONFIG_PATH)
+        if self.proxy_manager.enabled:
+            logger.info(f"Proxy enabled: {self.proxy_manager}")
+
     def _load_config(self, config_path: Path) -> Dict:
         """Load configuration from JSON file"""
         try:
@@ -126,6 +132,13 @@ class TwitterScraper:
         # Apply fingerprint using the anti-detection manager
         fingerprint = self.anti_detection.get_fingerprint_for_account('twitter_public')
         context_options = self.anti_detection.get_context_options(fingerprint)
+
+        # Apply proxy settings if enabled
+        proxy_opts = self.proxy_manager.get_playwright_proxy()
+        if proxy_opts:
+            context_options['proxy'] = proxy_opts
+            logger.info(f"Browser using proxy: {self.proxy_manager.provider} → {self.proxy_manager.host}:{self.proxy_manager.port}")
+
         self.context = await self.browser.new_context(**context_options)
 
         self.page = await self.context.new_page()

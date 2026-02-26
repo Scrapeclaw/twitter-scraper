@@ -1,132 +1,92 @@
-# Twitter/X Scraper
+# Twitter/X Profile Scraper
 
-**Name:** `twitter-scraper`  
-**Version:** `1.0.0`  
-**Runtime:** `python3`  
-**Browser:** `chromium` (via Playwright)
+A browser-based Twitter/X profile discovery and scraping tool.
+
+```yaml
+---
+name: twitter-scraper
+description: Discover and scrape Twitter/X public profiles from your browser.
+emoji: 🐦
+version: 1.0.0
+author: influenza
+tags:
+  - twitter
+  - x
+  - scraping
+  - social-media
+  - profile-discovery
+  - influencer-discovery
+metadata:
+  clawdbot:
+    requires:
+      bins:
+        - python3
+        - chromium
+
+    config:
+      stateDirs:
+        - data/output
+        - data/queue
+        - thumbnails
+      outputFormats:
+        - json
+        - csv
+---
+```
 
 ## Overview
 
-Two-phase scraping system for Twitter/X public profiles:
+This skill provides a two-phase Twitter/X scraping system:
 
-1. **Profile Discovery** — Find Twitter accounts via Google Custom Search API or DuckDuckGo (searches `x.com` and `twitter.com`)
+1. **Profile Discovery** — Find Twitter accounts via Google Custom Search API or DuckDuckGo
 2. **Browser Scraping** — Scrape public profiles using Playwright with anti-detection (no login required)
 
-## Setup
+## Features
 
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
+- 🔍  - Discover Twitter/X profiles by location and category
+- 🌐  - Full browser simulation for accurate scraping
+- 🛡️  - Browser fingerprinting, human behavior simulation, and stealth scripts
+- 📊  - Profile info, followers, tweets, engagement data, and media
+- 💾  - JSON/CSV export with downloaded thumbnails
+- 🔄  - Resume interrupted scraping sessions
+- ⚡  - Auto-skip private accounts, low-follower profiles, suspended users
+- 🌍  - Built-in residential proxy support with 4 providers
 
-# Install Playwright browser
-playwright install chromium
-```
+#### Getting Google API Credentials (Optional)
 
-### Google Custom Search API (Optional)
-
-For discovery via Google:
-
-1. Create API key at [Google Cloud Console](https://console.cloud.google.com/)
-2. Create Programmable Search Engine at [cse.google.com](https://cse.google.com/) scoped to `x.com` and `twitter.com`
-3. Set values in `config/scraper_config.json`:
-   ```json
-   {
-     "google_search": {
-       "enabled": true,
-       "api_key": "YOUR_API_KEY",
-       "search_engine_id": "YOUR_CX_ID"
-     }
-   }
-   ```
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing
+3. Enable "Custom Search API"
+4. Create API credentials → API Key
+5. Go to [Programmable Search Engine](https://programmablesearchengine.google.com/)
+6. Create a search engine with `x.com` and `twitter.com` as the sites to search
+7. Copy the Search Engine ID
 
 If not configured, discovery falls back to DuckDuckGo (no API key needed).
 
-## Commands
+## Usage
 
-### Discover Profiles
+### Agent Tool Interface
 
-```bash
-# Interactive mode
-python main.py discover
-
-# Specific location + category
-python main.py discover --location "New York" --category tech --count 15
-
-# Batch mode (multiple cities x categories)
-python main.py discover --batch
-
-# JSON output (for agent integration)
-python main.py discover --location "Miami" --category crypto --output json
-```
-
-### Scrape Profiles
+For OpenClaw agent integration, the skill provides JSON output:
 
 ```bash
+# Discover Twitter profiles (returns JSON)
+discover --location "Miami" --category "tech" --output json
+
+# Discover profiles in a specific category (returns JSON)
+discover --location "New York" --category "crypto" --output json
+
+# Scrape single profile (returns JSON)
+scrape --username elonmusk --output json
+
 # Scrape from a queue file
-python main.py scrape data/queue/New_York_tech_20260217_120000.json
-
-# Scrape a single profile
-python main.py scrape --username elonmusk
-
-# Scrape multiple usernames (manual list)
-python main.py scrape --usernames user1,user2,user3 --category tech
-
-# Headless mode
-python main.py scrape --username nasa --headless
-
-# JSON output
-python main.py scrape --username elonmusk --output json
+scrape data/queue/Miami_tech_20260220_120000.json
 ```
 
-### List Queue Files
+## Output Data
 
-```bash
-python main.py list
-```
-
-### Export Data
-
-```bash
-# Export to both JSON and CSV
-python main.py export --format both
-
-# JSON only
-python main.py export --format json
-
-# CSV only (produces profiles CSV + tweets CSV)
-python main.py export --format csv
-```
-
-## Directory Structure
-
-```
-twitter-scraper/
-├── main.py                  # CLI entry point
-├── scraper.py               # Core TwitterScraper class
-├── discovery.py             # Profile discovery (Google/DuckDuckGo)
-├── anti_detection.py        # Anti-detection system
-├── requirements.txt
-├── SKILL.md
-├── config/
-│   └── scraper_config.json  # Configuration
-├── data/
-│   ├── browser_fingerprints.json
-│   ├── output/              # Per-profile JSON output
-│   └── queue/               # Discovery queue files
-└── thumbnails/              # Downloaded media
-```
-
-## Data State
-
-| Directory | Contents |
-|-----------|----------|
-| `data/queue/` | Queue files: `{location}_{category}_{timestamp}.json` |
-| `data/output/` | Scraped profiles: `{username}.json` |
-| `thumbnails/` | Downloaded images: `{username}/profile_*.jpg`, `{username}/tweet_media_*.jpg` |
-
-## Output Schema
-
-### Profile JSON (`data/output/{username}.json`)
+### Profile Data Structure
 
 ```json
 {
@@ -165,7 +125,7 @@ twitter-scraper/
 }
 ```
 
-### Queue File (`data/queue/{location}_{category}_{timestamp}.json`)
+### Queue File Structure
 
 ```json
 {
@@ -181,27 +141,65 @@ twitter-scraper/
 }
 ```
 
-## Influencer Tiers
+### Influencer Tiers
 
-| Tier | Followers |
-|------|-----------|
-| nano | < 1,000 |
-| micro | 1,000 - 10,000 |
-| mid | 10,000 - 100,000 |
-| macro | 100,000 - 1,000,000 |
-| mega | > 1,000,000 |
+| Tier  | Followers Range     |
+|-------|---------------------|
+| nano  | < 1,000             |
+| micro | 1,000 - 10,000      |
+| mid   | 10,000 - 100,000    |
+| macro | 100,000 - 1M        |
+| mega  | > 1,000,000         |
 
-## Configuration (`config/scraper_config.json`)
+### File Outputs
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `scraper.headless` | `false` | Run browser without GUI |
-| `scraper.min_followers` | `500` | Skip profiles below this count |
-| `scraper.max_tweets` | `20` | Max recent tweets to scrape per profile |
-| `scraper.max_thumbnails` | `6` | Max media images to download |
-| `scraper.download_thumbnails` | `true` | Download profile pics and media |
-| `scraper.delay_between_profiles` | `[4, 8]` | Random delay range (seconds) |
-| `scraper.timeout` | `60000` | Page load timeout (ms) |
+- **Queue files**: `data/queue/{location}_{category}_{timestamp}.json`
+- **Scraped data**: `data/output/{username}.json`
+- **Thumbnails**: `thumbnails/{username}/profile_*.jpg`, `thumbnails/{username}/tweet_media_*.jpg`
+- **Export files**: `data/export_{timestamp}.json`, `data/export_{timestamp}.csv`
+
+## Configuration
+
+Edit `config/scraper_config.json`:
+
+```json
+{
+  "proxy": {
+    "enabled": false,
+    "provider": "brightdata",
+    "country": "",
+    "sticky": true,
+    "sticky_ttl_minutes": 10
+  },
+  "google_search": {
+    "enabled": true,
+    "api_key": "",
+    "search_engine_id": "",
+    "queries_per_location": 3
+  },
+  "scraper": {
+    "headless": false,
+    "min_followers": 500,
+    "max_tweets": 20,
+    "download_thumbnails": true,
+    "max_thumbnails": 6,
+    "delay_between_profiles": [4, 8],
+    "timeout": 60000
+  },
+  "cities": ["New York", "Los Angeles", "Miami", "Chicago"],
+  "categories": ["tech", "politics", "sports", "entertainment", "news", "crypto"]
+}
+```
+
+## Filters Applied
+
+The scraper automatically filters out:
+
+- ❌ Suspended or deactivated accounts
+- ❌ Protected (private) accounts
+- ❌ Profiles with < 500 followers (configurable)
+- ❌ Non-existent usernames
+- ❌ Already scraped entries (deduplication)
 
 ## Anti-Detection
 
@@ -213,12 +211,164 @@ The scraper uses multiple anti-detection techniques:
 - **Network randomization** — Variable timing between requests
 - **Login wall handling** — Automatically dismisses Twitter's login prompts and overlays
 
-## Filters
+## Troubleshooting
 
-Profiles are automatically skipped if:
-- Account doesn't exist or is suspended
-- Account is protected (private)
-- Followers count < `min_followers` config value
+### No Profiles Discovered
+
+- Check Google API key and quota
+- Verify Search Engine ID is configured for x.com and twitter.com
+- Try different location/category combinations
+- If Google fails, DuckDuckGo fallback is used automatically
+
+### Rate Limiting
+
+- Reduce scraping speed (increase delays in config)
+- Run during off-peak hours
+- **Use a residential proxy** (see below)
+
+### Login Wall Issues
+
+- The scraper automatically dismisses login prompts
+- If content is blocked, try running with `--headless` disabled to debug visually
+
+---
+
+## 🌐 Residential Proxy Support
+
+### Why Use a Residential Proxy?
+
+Running a scraper at scale **without** a residential proxy will get your IP blocked fast. Here's why proxies are essential for long-running scrapes:
+
+| Advantage | Description |
+|-----------|-------------|
+| **Avoid IP Bans** | Residential IPs look like real household users, not data-center bots. Twitter/X is far less likely to flag them. |
+| **Automatic IP Rotation** | Each request (or session) gets a fresh IP, so rate-limits never stack up on one address. |
+| **Geo-Targeting** | Route traffic through a specific country/city so scraped content matches the target audience's locale. |
+| **Sticky Sessions** | Keep the same IP for a configurable window (e.g. 10 min) — critical for maintaining a consistent browsing session. |
+| **Higher Success Rate** | Rotating residential IPs deliver 95%+ success rates compared to ~30% with data-center proxies on Twitter/X. |
+| **Long-Running Scrapes** | Scrape thousands of profiles over hours or days without interruption. |
+| **Concurrent Scraping** | Run multiple browser instances across different IPs simultaneously. |
+
+### Recommended Proxy Providers
+
+We have affiliate partnerships with top residential proxy providers. Using these links supports continued development of this skill:
+
+| Provider | Best For | Sign Up |
+|----------|----------|---------|
+| **Bright Data** | World's largest network, 72M+ IPs, enterprise-grade | 👉 [**Get Bright Data**](https://get.brightdata.com/o1kpd2da8iv4) |
+| **IProyal** | Pay-as-you-go, 195+ countries, no traffic expiry | 👉 [**Get IProyal**](https://iproyal.com/?r=ScrapeClaw) |
+| **Storm Proxies** | Fast & reliable, developer-friendly API, competitive pricing | 👉 [**Get Storm Proxies**](https://stormproxies.com/clients/aff/go/scrapeclaw) |
+| **NetNut** | ISP-grade network, 52M+ IPs, direct connectivity | 👉 [**Get NetNut**](https://netnut.io?ref=mwrlzwv) |
+
+> 💡 **Our Recommendation:** For this Twitter/X scraper, we recommend **[Bright Data](https://get.brightdata.com/o1kpd2da8iv4)** — their residential rotating network is fast, has the largest IP pool, and works seamlessly with Playwright-based scraping.
+
+### Setup Steps
+
+#### 1. Get Your Proxy Credentials
+
+Sign up with any provider above, then grab:
+- **Username** (from your provider dashboard)
+- **Password** (from your provider dashboard)
+- **Host** and **Port** are pre-configured per provider (or use custom)
+
+#### 2. Configure via Environment Variables
+
+```bash
+export PROXY_ENABLED=true
+export PROXY_PROVIDER=brightdata    # brightdata | iproyal | stormproxies | netnut | custom
+export PROXY_USERNAME=your_user
+export PROXY_PASSWORD=your_pass
+export PROXY_COUNTRY=us             # optional: two-letter country code
+export PROXY_STICKY=true            # optional: keep same IP per session
+```
+
+#### 3. Provider-Specific Host/Port Defaults
+
+These are auto-configured when you set the `provider` name:
+
+| Provider | Host | Port |
+|----------|------|------|
+| Bright Data | `brd.superproxy.io` | `22225` |
+| IProyal | `proxy.iproyal.com` | `12321` |
+| Storm Proxies | `rotating.stormproxies.com` | `9999` |
+| NetNut | `gw-resi.netnut.io` | `5959` |
+
+Override with `PROXY_HOST` / `PROXY_PORT` env vars if your plan uses a different gateway.
+
+#### 4. Custom Proxy Provider
+
+For any other proxy service, set provider to `custom` and supply host/port manually:
+
+```json
+{
+  "proxy": {
+    "enabled": true,
+    "provider": "custom",
+    "host": "your.proxy.host",
+    "port": 8080,
+    "username": "user",
+    "password": "pass"
+  }
+}
+```
+
+### Running the Scraper with Proxy
+
+Once configured, the scraper picks up the proxy automatically — no extra flags needed:
+
+```bash
+# Discover and scrape as usual — proxy is applied automatically
+python main.py discover --location "Miami" --category "tech"
+python main.py scrape --username elonmusk
+
+# The log will confirm proxy is active:
+# INFO - Proxy enabled: <ProxyManager provider=brightdata enabled host=brd.superproxy.io:22225>
+# INFO - Browser using proxy: brightdata → brd.superproxy.io:22225
+```
+
+### Using the Proxy Manager Programmatically
+
+```python
+from proxy_manager import ProxyManager
+
+# From config (auto-reads config/scraper_config.json)
+pm = ProxyManager.from_config()
+
+# From environment variables
+pm = ProxyManager.from_env()
+
+# Manual construction
+pm = ProxyManager(
+    provider="brightdata",
+    username="your_user",
+    password="your_pass",
+    country="us",
+    sticky=True
+)
+
+# For Playwright browser context
+proxy = pm.get_playwright_proxy()
+# → {"server": "http://brd.superproxy.io:22225", "username": "user-country-us-session-abc123", "password": "pass"}
+
+# For requests / aiohttp
+proxies = pm.get_requests_proxy()
+# → {"http": "http://user:pass@host:port", "https": "http://user:pass@host:port"}
+
+# Force new IP (rotates session ID)
+pm.rotate_session()
+
+# Debug info
+print(pm.info())
+```
+
+### Best Practices for Long-Running Scrapes
+
+1. **Use sticky sessions** — Twitter requires consistent IPs during a browsing session. Set `"sticky": true`.
+2. **Target the right country** — Set `"country": "us"` (or your target region) so Twitter serves content in the expected locale.
+3. **Combine with existing anti-detection** — This scraper already has fingerprinting, stealth scripts, and human behavior simulation. The proxy is the final layer.
+4. **Rotate sessions between batches** — Call `pm.rotate_session()` between large batches of profiles to get a fresh IP.
+5. **Use delays** — Even with proxies, respect `delay_between_profiles` in config (default 4-8s) to avoid aggressive patterns.
+6. **Monitor your proxy dashboard** — All providers have dashboards showing bandwidth usage and success rates.
 
 ## Notes
 
