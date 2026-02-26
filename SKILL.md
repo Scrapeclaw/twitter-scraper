@@ -1,13 +1,16 @@
 # Twitter/X Profile Scraper
 
+
 A browser-based Twitter/X profile discovery and scraping tool.
+
+> Part of **[ScrapeClaw](https://www.scrapeclaw.cc/)** — a suite of production-ready, agentic social media scrapers for Instagram, YouTube, X/Twitter, and Facebook built with Python & Playwright, no API keys required.
 
 ```yaml
 ---
 name: twitter-scraper
 description: Discover and scrape Twitter/X public profiles from your browser.
 emoji: 🐦
-version: 1.0.0
+version: 1.0.2
 author: influenza
 tags:
   - twitter
@@ -260,7 +263,7 @@ We have affiliate partnerships with top residential proxy providers. Using these
 | **Storm Proxies** | Fast & reliable, developer-friendly API, competitive pricing | 👉 [**Get Storm Proxies**](https://stormproxies.com/clients/aff/go/scrapeclaw) |
 | **NetNut** | ISP-grade network, 52M+ IPs, direct connectivity | 👉 [**Get NetNut**](https://netnut.io?ref=mwrlzwv) |
 
-> 💡 **Our Recommendation:** For this Twitter/X scraper, we recommend **[Bright Data](https://get.brightdata.com/o1kpd2da8iv4)** — their residential rotating network is fast, has the largest IP pool, and works seamlessly with Playwright-based scraping.
+
 
 ### Setup Steps
 
