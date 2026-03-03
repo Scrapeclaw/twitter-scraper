@@ -17,6 +17,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional
 import requests
+from playwright.sync_api import sync_playwright
 
 # Force UTF-8 encoding for stdout/stderr on Windows
 if sys.platform == 'win32':
@@ -69,7 +70,7 @@ def discover_profiles_google(
     config: Dict = None
 ) -> List[str]:
     """
-    Discover Twitter/X profiles using Google Custom Search API
+    Discover Twitter/X profiles using Google search via Playwright
     
     Args:
         location: Location/city to search (e.g., 'New York', 'Miami')
@@ -86,81 +87,99 @@ def discover_profiles_google(
         
         google_config = config.get('google_search', {})
         if not google_config.get('enabled', False):
-            logger.warning("Google Search API is disabled in config")
+            logger.warning("Google Search is disabled in config")
             return []
         
-        api_key = google_config.get('api_key')
-        cx = google_config.get('search_engine_id')
         queries_per_location = google_config.get('queries_per_location', 3)
         
-        if not api_key or not cx:
-            logger.warning("Google API key or Search Engine ID not configured. Using DuckDuckGo fallback.")
-            return discover_profiles_duckduckgo(location, category, num_results)
-        
         # Generate multiple search queries for better coverage
-        # Search both x.com and twitter.com domains, exclude /status/ (individual tweets)
         search_queries = [
             f'site:x.com "{location}" "{category}" -/status/',
-            f'site:twitter.com "{location}" {category} -/status/',
+            f'site:twitter.com "{location}" "{category}" -/status/',
             f'site:x.com {category} "{location}" influencer -/status/',
         ][:queries_per_location]
         
         all_usernames = []
         
-        for query in search_queries:
-            try:
-                logger.info(f"Searching Google: '{query}'")
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
+                page.set_default_timeout(30000)
                 
-                url = "https://www.googleapis.com/customsearch/v1"
-                params = {
-                    'key': api_key,
-                    'cx': cx,
-                    'q': query,
-                    'num': min(num_results, 10)
-                }
+                for query in search_queries:
+                    try:
+                        logger.info(f"Searching Google: '{query}'")
+                        
+                        # Navigate to Google
+                        page.goto("https://www.google.com", wait_until="networkidle")
+                        
+                        # Accept cookies if needed
+                        try:
+                            page.click("button:has-text('Accept all')", timeout=3000)
+                        except:
+                            pass
+                        
+                        # Search
+                        search_input = page.query_selector("input[name='q']")
+                        if search_input:
+                            search_input.fill(query)
+                            search_input.press("Enter")
+                            page.wait_for_load_state("networkidle")
+                        else:
+                            logger.warning("Could not find Google search input")
+                            continue
+                        
+                        # Extract results - look for links in search results
+                        links = page.query_selector_all("a")
+                        logger.info(f"  Found {len(links)} links in search results")
+                        
+                        for link in links:
+                            try:
+                                href = link.get_attribute("href")
+                                if href and ('x.com' in href or 'twitter.com' in href):
+                                    # Extract username from URL
+                                    match = re.search(r'(?:x\.com|twitter\.com)/([a-zA-Z0-9_]+)/?', href)
+                                    if match:
+                                        username = match.group(1)
+                                        if username.lower() not in TWITTER_BLACKLIST and len(username) > 1:
+                                            if username not in all_usernames:
+                                                all_usernames.append(username)
+                                                logger.info(f"  Found: @{username}")
+                            except Exception as e:
+                                logger.debug(f"Error extracting link: {e}")
+                        
+                        time.sleep(1)
+                        
+                    except Exception as e:
+                        logger.warning(f"Error searching for query '{query}': {e}")
+                        continue
                 
-                response = requests.get(url, params=params, timeout=10)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    total_results = data.get('searchInformation', {}).get('totalResults', 0)
-                    logger.info(f"  Found {total_results} total results")
-                    
-                    for item in data.get('items', []):
-                        link = item.get('link', '')
-                        # Match both x.com and twitter.com profile URLs
-                        match = re.search(r'(?:x\.com|twitter\.com)/([a-zA-Z0-9_]+)/?', link)
-                        if match:
-                            username = match.group(1)
-                            if username.lower() not in TWITTER_BLACKLIST and len(username) > 1:
-                                all_usernames.append(username)
-                                logger.info(f"  Found: @{username}")
-                    
-                elif response.status_code == 429:
-                    logger.warning("Google API rate limit reached")
-                    break
-                else:
-                    logger.warning(f"Google API error {response.status_code} for query: {query}")
-                
-                time.sleep(0.5)
-                
-            except Exception as e:
-                logger.error(f"Error processing query '{query}': {e}")
-                continue
-        
-        unique_usernames = list(set(all_usernames))
-        logger.info(f"Discovered {len(unique_usernames)} unique profiles from Google")
-        return unique_usernames
+                browser.close()
+            
+            unique_usernames = list(set(all_usernames))
+            logger.info(f"Discovered {len(unique_usernames)} unique profiles from Google")
+            
+            if not unique_usernames:
+                logger.info("No profiles found via Google, falling back to DuckDuckGo")
+                return discover_profiles_duckduckgo(location, category, num_results)
+            
+            return unique_usernames
+            
+        except Exception as e:
+            logger.warning(f"Google search failed: {e}. Falling back to DuckDuckGo.")
+            return discover_profiles_duckduckgo(location, category, num_results)
             
     except Exception as e:
         logger.error(f"Error in Google profile discovery: {e}")
-        return []
+        return discover_profiles_duckduckgo(location, category, num_results)
 
 
 def discover_profiles_duckduckgo(
     location: str, 
     category: str, 
-    num_results: int = 10
+    num_results: int = 10,
+    max_retries: int = 3
 ) -> List[str]:
     """
     Discover Twitter/X profiles using DuckDuckGo HTML search (No API key required)
@@ -169,6 +188,7 @@ def discover_profiles_duckduckgo(
         location: Location/city to search
         category: Category to search
         num_results: Number of results to fetch
+        max_retries: Maximum number of retries on rate limit
     
     Returns:
         List of Twitter usernames
@@ -187,27 +207,50 @@ def discover_profiles_duckduckgo(
         params = {'q': query}
         
         logger.info(f"Searching DuckDuckGo: '{query}'")
-        response = requests.post(url, data=params, headers=headers, timeout=15)
         
-        if response.status_code != 200:
-            logger.error(f"DuckDuckGo search failed with status {response.status_code}")
-            return []
-            
-        html_content = response.text
-        usernames = []
+        # Retry logic for rate limiting
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(url, data=params, headers=headers, timeout=15)
+                
+                if response.status_code == 200:
+                    html_content = response.text
+                    usernames = []
+                    
+                    # Match both x.com and twitter.com profile URLs
+                    matches = re.findall(r'(?:x\.com|twitter\.com)/([a-zA-Z0-9_]+)/?', html_content)
+                    
+                    for username in matches:
+                        username = username.strip()
+                        if username and username.lower() not in TWITTER_BLACKLIST and len(username) > 1:
+                            usernames.append(username)
+                    
+                    unique_usernames = list(set(usernames))[:num_results]
+                    logger.info(f"Discovered {len(unique_usernames)} unique profiles from DuckDuckGo")
+                    
+                    return unique_usernames
+                    
+                elif response.status_code in [202, 429]:
+                    wait_time = (2 ** attempt) + random.uniform(0, 1)  # Exponential backoff
+                    logger.warning(f"DuckDuckGo rate limited (status {response.status_code}). Retrying in {wait_time:.1f}s... (attempt {attempt+1}/{max_retries})")
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    logger.error(f"DuckDuckGo search failed with status {response.status_code}")
+                    return []
+                    
+            except requests.Timeout:
+                wait_time = (2 ** attempt) + random.uniform(0, 1)
+                if attempt < max_retries - 1:
+                    logger.warning(f"DuckDuckGo request timeout. Retrying in {wait_time:.1f}s... (attempt {attempt+1}/{max_retries})")
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    logger.error("DuckDuckGo request timeout after retries")
+                    return []
         
-        # Match both x.com and twitter.com profile URLs
-        matches = re.findall(r'(?:x\.com|twitter\.com)/([a-zA-Z0-9_]+)/?', html_content)
-        
-        for username in matches:
-            username = username.strip()
-            if username and username.lower() not in TWITTER_BLACKLIST and len(username) > 1:
-                usernames.append(username)
-        
-        unique_usernames = list(set(usernames))[:num_results]
-        logger.info(f"Discovered {len(unique_usernames)} unique profiles from DuckDuckGo")
-        
-        return unique_usernames
+        logger.error(f"DuckDuckGo search failed after {max_retries} retries")
+        return []
 
     except Exception as e:
         logger.error(f"Error in DuckDuckGo discovery: {e}")
