@@ -1,0 +1,49 @@
+{
+  "actorSpecification": 1,
+  "name": "twitter-x-profile-scraper",
+  "title": "Twitter/X Profile Scraper & Discovery",
+  "description": "Discovers and scrapes public Twitter/X profiles by category and location. Returns follower counts, bios, influencer tier, recent tweets with engagement metrics — no login or API key required.",
+  "version": "1.0",
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "views": {
+        "overview": {
+          "title": "Profile Results",
+          "transformation": {
+            "fields": [
+              "username",
+              "display_name",
+              "followers",
+              "following",
+              "tweets_count",
+              "influencer_tier",
+              "is_verified",
+              "bio",
+              "user_location",
+              "website",
+              "join_date",
+              "category",
+              "scrape_location",
+              "scraped_at"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {
+              "username":        { "label": "Username",      "format": "text" },
+              "display_name":    { "label": "Name",          "format": "text" },
+              "followers":       { "label": "Followers",     "format": "number" },
+              "influencer_tier": { "label": "Tier",          "format": "text" },
+              "is_verified":     { "label": "Verified",      "format": "boolean" },
+              "category":        { "label": "Category",      "format": "text" },
+              "scrape_location": { "label": "Location",      "format": "text" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

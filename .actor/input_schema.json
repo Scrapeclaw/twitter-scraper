@@ -1,0 +1,129 @@
+{
+  "title": "Twitter/X Profile Scraper & Discovery",
+  "description": "Discovers and scrapes public Twitter/X profiles by category and location, or scrapes a specific list of usernames.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "mode": {
+      "title": "Run Mode",
+      "type": "string",
+      "enum": ["full", "discovery_only", "scrape_profiles"],
+      "enumTitles": [
+        "Full (discover + scrape)",
+        "Discovery only (find usernames)",
+        "Scrape specific profiles"
+      ],
+      "default": "full",
+      "description": "full = discover profiles then scrape them; discovery_only = only find usernames; scrape_profiles = scrape the profileUsernames list directly.",
+      "editor": "select"
+    },
+    "region": {
+      "title": "Region Preset",
+      "type": "string",
+      "enum": ["us", "uk", "ind", "eur", "gulf", "east", "custom"],
+      "enumTitles": [
+        "United States (us)",
+        "United Kingdom (uk)",
+        "India (ind)",
+        "Europe (eur)",
+        "Gulf / Middle East (gulf)",
+        "East Asia (east)",
+        "Custom (use categories & locations below)"
+      ],
+      "default": "us",
+      "description": "Pre-configured region with relevant categories and locations. Choose 'custom' to specify your own.",
+      "editor": "select"
+    },
+    "categories": {
+      "title": "Categories",
+      "type": "array",
+      "description": "Content categories to discover (used when region = custom or to override preset).",
+      "editor": "stringList",
+      "items": { "type": "string" },
+      "default": ["tech", "sports", "entertainment", "news", "finance", "politics"]
+    },
+    "locations": {
+      "title": "Locations",
+      "type": "array",
+      "description": "Geographic locations to search within (used when region = custom or to override preset).",
+      "editor": "stringList",
+      "items": { "type": "string" },
+      "default": ["New York", "Los Angeles", "Chicago", "Miami", "San Francisco"]
+    },
+    "profileUsernames": {
+      "title": "Profile Usernames (scrape_profiles mode)",
+      "type": "array",
+      "description": "List of Twitter/X usernames to scrape directly. Used when mode = scrape_profiles. Include or omit the @ prefix.",
+      "editor": "stringList",
+      "items": { "type": "string" },
+      "example": ["elonmusk", "NASA", "BBCBreaking"]
+    },
+    "maxProfiles": {
+      "title": "Max Profiles to Scrape",
+      "type": "integer",
+      "description": "Maximum number of profiles to scrape (0 = unlimited).",
+      "default": 50,
+      "minimum": 0,
+      "maximum": 10000,
+      "editor": "number"
+    },
+    "minFollowers": {
+      "title": "Minimum Followers Filter",
+      "type": "integer",
+      "description": "Skip profiles with fewer followers than this value (0 = no filter).",
+      "default": 500,
+      "minimum": 0,
+      "editor": "number"
+    },
+    "maxTweetsPerProfile": {
+      "title": "Max Recent Tweets Per Profile",
+      "type": "integer",
+      "description": "Number of recent tweets to scrape per profile.",
+      "default": 20,
+      "minimum": 0,
+      "maximum": 100,
+      "editor": "number"
+    },
+    "downloadThumbnails": {
+      "title": "Download Profile Pics & Media to Key-Value Store",
+      "type": "boolean",
+      "description": "If enabled, profile pictures and tweet media images are downloaded and stored in the actor's Key-Value store.",
+      "default": false,
+      "editor": "checkbox"
+    },
+    "googleApiKey": {
+      "title": "Google Custom Search API Key",
+      "type": "string",
+      "description": "Optional. If provided together with googleSearchEngineId, uses Google Custom Search for discovery instead of DuckDuckGo.",
+      "editor": "textfield",
+      "isSecret": true
+    },
+    "googleSearchEngineId": {
+      "title": "Google Custom Search Engine ID (CX)",
+      "type": "string",
+      "description": "Optional. The Custom Search Engine ID (cx) to use with the Google API key.",
+      "editor": "textfield"
+    },
+    "skipProxyValidation": {
+      "title": "Skip Proxy Validation",
+      "type": "boolean",
+      "description": "Skip the proxy connectivity check before scraping. Useful when the proxy is known to work but blocks common test sites.",
+      "default": false,
+      "editor": "checkbox"
+    },
+    "dropProxyOnFailure": {
+      "title": "Drop Proxy if Validation Fails",
+      "type": "boolean",
+      "description": "If proxy validation fails, disable the proxy and run directly. By default the proxy is kept even if validation fails.",
+      "default": false,
+      "editor": "checkbox"
+    },
+    "proxyConfiguration": {
+      "title": "Proxy Configuration",
+      "type": "object",
+      "description": "Apify proxy settings. Recommended: use Apify Residential proxies to avoid rate-limiting by Twitter/X.",
+      "prefill": { "useApifyProxy": true, "apifyProxyGroups": ["RESIDENTIAL"] },
+      "editor": "proxy"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "mode": "full",
+  "region": "us",
+  "categories": ["tech", "sports", "entertainment", "finance"],
+  "locations": ["New York", "Los Angeles", "Chicago", "Miami"],
+  "maxProfiles": 50,
+  "minFollowers": 500,
+  "maxTweetsPerProfile": 20,
+  "downloadThumbnails": false,
+  "googleApiKey": "",
+  "googleSearchEngineId": "",
+  "skipProxyValidation": false,
+  "dropProxyOnFailure": false,
+  "proxyConfiguration": {
+    "useApifyProxy": true,
+    "apifyProxyGroups": ["RESIDENTIAL"]
+  }
+}

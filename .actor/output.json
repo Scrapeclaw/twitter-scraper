@@ -1,0 +1,51 @@
+{
+  "example": {
+    "username": "elonmusk",
+    "display_name": "Elon Musk",
+    "bio": "CEO of X, SpaceX, Tesla",
+    "followers": 175000000,
+    "following": 620,
+    "tweets_count": 42000,
+    "is_verified": true,
+    "influencer_tier": "mega",
+    "profile_pic_url": "https://pbs.twimg.com/profile_images/.../photo.jpg",
+    "user_location": "Austin, TX",
+    "join_date": "June 2009",
+    "website": "https://x.com",
+    "category": "tech",
+    "scrape_location": "San Francisco",
+    "scraped_at": "2025-01-01T12:00:00",
+    "recent_tweets": [
+      {
+        "id": "1234567890",
+        "text": "Example tweet text",
+        "timestamp": "2025-01-01T11:00:00Z",
+        "likes": 50000,
+        "retweets": 12000,
+        "replies": 8000,
+        "media_urls": [],
+        "is_retweet": false,
+        "is_reply": false,
+        "url": "https://x.com/elonmusk/status/1234567890"
+      }
+    ]
+  },
+  "fields": {
+    "username":        "Twitter/X handle (without @)",
+    "display_name":    "Profile display name",
+    "bio":             "Profile biography / description",
+    "followers":       "Number of followers (integer)",
+    "following":       "Number of accounts followed (integer)",
+    "tweets_count":    "Total tweets/posts count (integer)",
+    "is_verified":     "Has verified badge (blue checkmark)",
+    "influencer_tier": "nano (<1 K) | micro (<10 K) | mid (<100 K) | macro (<1 M) | mega (≥1 M)",
+    "profile_pic_url": "URL of the profile avatar image",
+    "user_location":   "Location string from the profile header",
+    "join_date":       "Month/year the account was created",
+    "website":         "Link in the profile header",
+    "category":        "Niche category used during discovery",
+    "scrape_location": "City/region used during discovery",
+    "scraped_at":      "ISO-8601 timestamp of when the profile was scraped",
+    "recent_tweets":   "Array of recent tweets with engagement metrics"
+  }
+}
